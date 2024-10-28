@@ -38,8 +38,8 @@ SQLite does not require server configuration and runs directly on the local file
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/sample-app.git
-cd sample-app
+git clone https://github.com/FluxonApps/nie-bootcamp-template.git
+cd nie-bootcamp-template
 ```
 
 ### 1. Install Backend (Server) Dependencies
