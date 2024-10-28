@@ -7,7 +7,7 @@ import { connectDB } from './config/db';
 dotenv.config();
 
 const app: Application = express();
-const PORT = process.env.PORT || 5010;
+const PORT = process.env.PORT || 5000;
 
 
 // Initialize database and start the server
