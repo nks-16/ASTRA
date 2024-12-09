@@ -1,5 +1,33 @@
 import axios from 'axios';
 
-export const fetchSampleData = () => {
-  return axios.get<{ id: number; name: string }[]>('http://localhost:5000/api/sample');
-};
+const API = axios.create({
+  baseURL: 'http://localhost:5000/api',
+});
+
+API.interceptors.request.use((req) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    req.headers.Authorization = `Bearer ${token}`;
+  }
+  return req;
+});
+
+export const login = (credentials: { email: string; password: string }) =>
+  API.post('/auth/login', credentials);
+
+export const signup = (data: { name: string; email: string; password: string }) =>
+  API.post('/auth/signup', data);
+
+export const createTeam = (teamName: string) =>
+  API.post('/teams', { teamName });
+
+export const joinTeam = (teamId: string) =>
+  API.post(`/teams/join/${teamId}`);
+
+export const fetchMCQs = () => API.get('/mcqs');
+
+export const submitMCQAnswers = (answers: any) => API.post('/mcqs/submit', answers);
+
+export const submitSolution = (data: { submissionLink: string }) =>
+  API.post('/submits', data);
+
