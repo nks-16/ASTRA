@@ -7,15 +7,16 @@ const SignupPage: React.FC = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const navigate = useNavigate();
 
   const handleSignup = async () => {
     try {
       await signup({ name, email, password });
-      alert("Signup successful! You can now log in.");
-      navigate("/login");
+      setMessage({ type: "success", text: "Signup successful! Redirecting to login..." });
+      setTimeout(() => navigate("/login"), 3000); // Redirect after 3 seconds
     } catch (error) {
-      alert("Signup failed. Please try again.");
+      setMessage({ type: "error", text: "Signup failed. Please check your details and try again." });
     }
   };
 
@@ -36,6 +37,20 @@ const SignupPage: React.FC = () => {
         >
           Create Your Account
         </motion.h2>
+
+        {/* Notification Message */}
+        {message && (
+          <motion.div
+            className={`mb-6 p-4 rounded-lg text-center font-semibold ${
+              message.type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+            }`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            {message.text}
+          </motion.div>
+        )}
 
         {/* Form */}
         <motion.div

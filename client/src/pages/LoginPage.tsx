@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { login } from "../services/apiService";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -12,14 +14,18 @@ const LoginPage: React.FC = () => {
     try {
       const response = await login({ email, password });
       localStorage.setItem("token", response.data.token);
-      navigate("/dashboard");
+      toast.success("Login successful! Redirecting to your dashboard...");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000); // Redirect after 2 seconds
     } catch (error) {
-      alert("Login failed. Please check your credentials.");
+      toast.error("Login failed. Please check your email and password.");
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white">
+      <ToastContainer />
       <motion.div
         className="w-full max-w-lg p-8 bg-gray-900 rounded-3xl shadow-2xl"
         initial={{ opacity: 0, y: -50 }}
