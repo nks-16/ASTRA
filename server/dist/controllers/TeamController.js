@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserTeamDetails = exports.joinTeam = exports.createTeam = void 0;
+exports.joinTeam = exports.createTeam = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const Team_1 = __importDefault(require("../models/Team"));
 const User_1 = __importDefault(require("../models/User"));
@@ -70,24 +70,3 @@ const joinTeam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.joinTeam = joinTeam;
 // Get the user's team details (to display in the dashboard)
-const getUserTeamDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        if (!req.user || !req.user.teamId) {
-            res.status(401).json({ message: 'Unauthorized or No Team Information' });
-            return;
-        }
-        const teamId = req.user.teamId; // Get teamId from the authenticated user's details
-        // Find the team based on the teamId
-        const team = yield Team_1.default.findById(teamId).populate('members'); // Assuming members are referenced in your Team model
-        if (!team) {
-            res.status(404).json({ message: 'No team found for this user' });
-            return;
-        }
-        // Return the team details
-        res.status(200).json(team);
-    }
-    catch (error) {
-        res.status(500).json({ message: 'Internal Server Error', error: error });
-    }
-});
-exports.getUserTeamDetails = getUserTeamDetails;
