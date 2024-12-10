@@ -17,7 +17,11 @@ dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
 // Middleware
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)({
+    origin: ['https://nisb-hackathon.vercel.app/', ' http://localhost:3000'], // Allow only this origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed HTTP methods
+    credentials: true // Allow cookies and credentials if needed
+}));
 app.use(express_1.default.json());
 // Database Connection
 mongoose_1.default
