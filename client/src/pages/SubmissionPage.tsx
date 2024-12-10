@@ -9,19 +9,39 @@ const SubmissionPage: React.FC = () => {
   const [selectedProblem, setSelectedProblem] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [isEligible, setIsEligible] = useState(false); // Eligibility state
+  const [loading, setLoading] = useState(true); // Loading state
   const navigate = useNavigate();
 
+  // Check eligibility and fetch problems
   useEffect(() => {
-    const fetchProblems = async () => {
+    const checkEligibilityAndFetchProblems = async () => {
       try {
-        const { data } = await axios.get('https://nisb-hackathon.onrender.com/api/problems'); // Update the endpoint as needed
-        setProblemList(data);
+        // Check if user is eligible for submission
+        const { data: eligibilityData } = await axios.get(
+          'https://nisb-hackathon.onrender.com/api/teams/check-eligibility'
+        );
+        if (!eligibilityData.isEligible) {
+          setIsEligible(false);
+          navigate('/not-eligible'); // Redirect if ineligible
+          return;
+        }
+        setIsEligible(true);
+
+        // Fetch problem list
+        const { data: problems } = await axios.get(
+          'https://nisb-hackathon.onrender.com/api/problems'
+        );
+        setProblemList(problems);
       } catch (err) {
-        console.error('Error fetching problem list:', err);
+        console.error('Error fetching eligibility or problems:', err);
+        navigate('/error'); // Redirect to an error page
+      } finally {
+        setLoading(false);
       }
     };
-    fetchProblems();
-  }, []);
+    checkEligibilityAndFetchProblems();
+  }, [navigate]);
 
   const validateLink = (link: string) => {
     const githubRegex = /^https:\/\/(www\.)?github\.com\/.+/i;
@@ -57,6 +77,22 @@ const SubmissionPage: React.FC = () => {
       setError('Submission failed. Please try again.');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (!isEligible) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <p>You are not eligible to make a submission.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center">
