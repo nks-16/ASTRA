@@ -1,31 +1,59 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Assuming you are using React Router
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { submitSolution } from '../services/apiService'; // Import API service
+import axios from 'axios';
 
 const SubmissionPage: React.FC = () => {
   const [submissionLink, setSubmissionLink] = useState('');
+  const [problemList, setProblemList] = useState<{ id: string; title: string }[]>([]);
+  const [selectedProblem, setSelectedProblem] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const navigate = useNavigate(); // For navigation
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProblems = async () => {
+      try {
+        const { data } = await axios.get('https://nisb-hackathon.onrender.com/api/problems'); // Update the endpoint as needed
+        setProblemList(data);
+      } catch (err) {
+        console.error('Error fetching problem list:', err);
+      }
+    };
+    fetchProblems();
+  }, []);
+
+  const validateLink = (link: string) => {
+    const githubRegex = /^https:\/\/(www\.)?github\.com\/.+/i;
+    const websiteRegex = /^https:\/\/.+\..+/i;
+    return githubRegex.test(link) || websiteRegex.test(link);
+  };
 
   const handleSubmit = async () => {
-    if (!submissionLink) {
-      setError('Submission link is required.');
+    if (!submissionLink || !selectedProblem) {
+      setError('Both problem selection and submission link are required.');
+      return;
+    }
+
+    if (!validateLink(submissionLink)) {
+      setError('Invalid link. Only GitHub or personal website links are allowed.');
       return;
     }
 
     setError('');
     setSuccessMessage('');
     try {
-      // Replace `submitSolution` with your actual API call logic
-      await new Promise((resolve) => setTimeout(resolve, 200)); // Simulating API call
+      await submitSolution({ submissionLink });
       setSuccessMessage('Submission successful! Thank you.');
-      setSubmissionLink(''); // Clear the input field
+      setSubmissionLink('');
+      setSelectedProblem('');
 
       // Redirect to home page after a delay
       setTimeout(() => {
-        navigate('/'); // Replace '/' with your home page route
+        navigate('/'); // Update to your desired home route
       }, 2000);
-    } catch (error) {
+    } catch (err) {
+      console.error('Submission failed:', err);
       setError('Submission failed. Please try again.');
     }
   };
@@ -34,19 +62,51 @@ const SubmissionPage: React.FC = () => {
     <div className="min-h-screen bg-black text-white flex items-center justify-center">
       <div className="bg-gray-900 p-8 rounded-lg shadow-xl border border-gray-800 w-full max-w-lg">
         <h2 className="text-4xl font-bold mb-6 text-center">Submission Page</h2>
-        <input
-          type="text"
-          placeholder="Enter your submission link"
-          value={submissionLink}
-          onChange={(e) => setSubmissionLink(e.target.value)}
-          className="w-full p-3 mb-4 rounded-lg bg-black text-gray-300 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        {error && (
-          <p className="text-red-500 text-sm mb-4">{error}</p>
-        )}
-        {successMessage && (
-          <p className="text-green-500 text-sm mb-4">{successMessage}</p>
-        )}
+
+        {/* Dropdown for Problem Selection */}
+        <div className="mb-4">
+          <label className="block mb-2 text-sm font-medium text-gray-300" htmlFor="problem">
+            Select Problem
+          </label>
+          <select
+            id="problem"
+            value={selectedProblem}
+            onChange={(e) => setSelectedProblem(e.target.value)}
+            className="w-full p-3 bg-black text-gray-300 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="" disabled>
+              -- Select a Problem --
+            </option>
+            {problemList.map((problem) => (
+              <option key={problem.id} value={problem.id}>
+                {problem.title}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Submission Link Input */}
+        <div className="mb-4">
+          <label className="block mb-2 text-sm font-medium text-gray-300" htmlFor="submissionLink">
+            Submission Link
+          </label>
+          <input
+            id="submissionLink"
+            type="text"
+            placeholder="Enter your GitHub or website link"
+            value={submissionLink}
+            onChange={(e) => setSubmissionLink(e.target.value)}
+            className="w-full p-3 bg-black text-gray-300 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* Error Message */}
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
+        {/* Success Message */}
+        {successMessage && <p className="text-green-500 text-sm mb-4">{successMessage}</p>}
+
+        {/* Submit Button */}
         <button
           onClick={handleSubmit}
           className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition duration-300"
