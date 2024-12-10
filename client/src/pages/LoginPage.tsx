@@ -2,30 +2,26 @@ import React, { useState } from "react";
 import { login } from "../services/apiService";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
       const response = await login({ email, password });
       localStorage.setItem("token", response.data.token);
-      toast.success("Login successful! Redirecting to your dashboard...");
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 2000); // Redirect after 2 seconds
+      setMessage({ type: "success", text: "Login successful! Redirecting to dashboard..." });
+      setTimeout(() => navigate("/dashboard"), 3000); // Redirect after 3 seconds
     } catch (error) {
-      toast.error("Login failed. Please check your email and password.");
+      setMessage({ type: "error", text: "Login failed. Please check your credentials." });
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white">
-      <ToastContainer />
       <motion.div
         className="w-full max-w-lg p-8 bg-gray-900 rounded-3xl shadow-2xl"
         initial={{ opacity: 0, y: -50 }}
@@ -41,6 +37,20 @@ const LoginPage: React.FC = () => {
         >
           Welcome Back!
         </motion.h2>
+
+        {/* Notification Message */}
+        {message && (
+          <motion.div
+            className={`mb-6 p-4 rounded-lg text-center font-semibold ${
+              message.type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+            }`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            {message.text}
+          </motion.div>
+        )}
 
         {/* Form */}
         <motion.div
