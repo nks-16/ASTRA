@@ -1,7 +1,5 @@
-import React from "react";
-import CreateTeam from "./CreateTeam";
-import JoinTeam from "./JoinTeam";
-import { motion } from "framer-motion";
+import React from 'react';
+import { motion } from 'framer-motion';
 
 const Dashboard: React.FC = () => {
   return (
@@ -42,7 +40,9 @@ const Dashboard: React.FC = () => {
               Start your journey by creating a team. Set your team name, share
               your team ID with members, and collaborate effectively!
             </p>
-            <CreateTeam />
+            <button className="mt-auto px-6 py-3 bg-blue-600 rounded-lg text-white font-semibold hover:bg-blue-700 transition-all">
+              Create Team
+            </button>
           </motion.div>
 
           {/* Join Team Section */}
@@ -58,7 +58,9 @@ const Dashboard: React.FC = () => {
               Already have a team ID? Join an existing team and get started
               right away with your teammates.
             </p>
-            <JoinTeam />
+            <button className="mt-auto px-6 py-3 bg-green-600 rounded-lg text-white font-semibold hover:bg-green-700 transition-all">
+              Join Team
+            </button>
           </motion.div>
         </motion.div>
       </motion.div>
