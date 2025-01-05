@@ -1,25 +1,57 @@
-// SignupPage.tsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const SignupPage: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+const Signup: React.FC = () => {
+  const [role, setRole] = useState<string>('investor');
+  const [username, setUsername] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      alert("Passwords don't match");
+    
+    // API Call to register user
+    const response = await fetch('/api/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username,
+        email,
+        password,
+        role
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      navigate('/login');
     } else {
-      // Handle the signup logic here
+      alert('Signup failed. Please try again.');
     }
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex justify-center items-center p-4">
-      <div className="w-full max-w-md p-8 bg-gray-800 rounded-2xl shadow-lg">
-        <h1 className="text-3xl font-semibold text-center mb-6 text-blue-400">Sign Up</h1>
-        <form onSubmit={handleSubmit}>
+    <div className="min-h-screen bg-gray-900 text-white flex justify-center items-center p-4">
+      <div className="w-full max-w-md p-8 bg-gray-800 rounded-xl shadow-lg">
+        <h2 className="text-3xl font-semibold text-center mb-6 text-blue-400">Sign Up</h2>
+        
+        <form onSubmit={handleSignup}>
+          <div className="mb-4">
+            <label htmlFor="username" className="block text-sm font-semibold text-gray-300">Username</label>
+            <input
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="w-full p-3 mt-2 bg-gray-700 text-white rounded-lg"
+            />
+          </div>
+          
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-semibold text-gray-300">Email</label>
             <input
@@ -27,9 +59,11 @@ const SignupPage: React.FC = () => {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 mt-2 bg-gray-700 text-white rounded-lg border border-gray-600"
+              required
+              className="w-full p-3 mt-2 bg-gray-700 text-white rounded-lg"
             />
           </div>
+
           <div className="mb-4">
             <label htmlFor="password" className="block text-sm font-semibold text-gray-300">Password</label>
             <input
@@ -37,20 +71,41 @@ const SignupPage: React.FC = () => {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 mt-2 bg-gray-700 text-white rounded-lg border border-gray-600"
+              required
+              className="w-full p-3 mt-2 bg-gray-700 text-white rounded-lg"
             />
           </div>
+
           <div className="mb-6">
-            <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-300">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full p-3 mt-2 bg-gray-700 text-white rounded-lg border border-gray-600"
-            />
+            <label className="block text-sm font-semibold text-gray-300">I am a:</label>
+            <div className="flex gap-4">
+              <label>
+                <input
+                  type="radio"
+                  value="investor"
+                  checked={role === 'investor'}
+                  onChange={() => setRole('investor')}
+                  className="text-blue-500"
+                />
+                Investor
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="proposer"
+                  checked={role === 'proposer'}
+                  onChange={() => setRole('proposer')}
+                  className="text-blue-500"
+                />
+                Proposer
+              </label>
+            </div>
           </div>
-          <button type="submit" className="w-full py-3 bg-blue-400 text-white rounded-lg hover:bg-blue-500">
+
+          <button
+            type="submit"
+            className="w-full py-3 bg-blue-600 rounded-lg text-white font-semibold hover:bg-blue-700"
+          >
             Sign Up
           </button>
         </form>
@@ -59,4 +114,4 @@ const SignupPage: React.FC = () => {
   );
 };
 
-export default SignupPage;
+export default Signup;
