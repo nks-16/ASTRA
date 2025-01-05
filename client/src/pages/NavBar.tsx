@@ -7,7 +7,7 @@ const NavBar: React.FC = () => {
     <nav className="bg-gray-900 shadow-md">
       <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
         <div className="text-2xl font-semibold text-white">
-          <Link to="/">YourApp</Link>
+          <Link to="/">FinAstra</Link>
         </div>
         <div className="hidden md:flex space-x-6 text-white">
           <Link to="/" className="hover:text-blue-400">Home</Link>
