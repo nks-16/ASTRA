@@ -1,26 +1,21 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
-import Dashboard from './pages/Dashboard';
-import NavBar from './pages/NavBar';
-const App: React.FC = () => {
+import UserPage from './pages/UserPage';
+import NewSubmission from './pages/NewSubmission';
+import PreviousSubmission from './pages/PreviousSubmission';
+import InvestorPage from './pages/InvestorPage';
+
+function App() {
   return (
     <Router>
-      <div>
-        <NavBar />
-        <main>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-          </Routes>
-        </main>
-      </div>
+      <Routes>
+        <Route path="/" element={<UserPage />} />
+        <Route path="/new-submission" element={<NewSubmission />} />
+        <Route path="/previous-submissions" element={<PreviousSubmission />} />
+        <Route path="/investor-page" element={<InvestorPage />} />
+      </Routes>
     </Router>
   );
-};
+}
 
 export default App;

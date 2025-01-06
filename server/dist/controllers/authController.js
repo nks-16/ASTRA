@@ -12,58 +12,68 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.register = void 0;
+exports.login = exports.signup = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const user_model_1 = __importDefault(require("../models/user_model"));
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const User_1 = __importDefault(require("../models/User"));
+// Secret key for JWT
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
+// Signup function to register a new user
+const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, email, password, role } = req.body;
     try {
-        // Check if user already exists
-        const existingUser = yield user_model_1.default.findOne({ email });
+        // Check if the user already exists
+        const existingUser = yield User_1.default.findOne({ username });
         if (existingUser) {
             res.status(400).json({ message: 'User already exists' });
             return;
         }
-        // Hash password
-        const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
-        // Create new user
-        const newUser = new user_model_1.default({
+        // Hash the password
+        const hashedPassword = yield bcryptjs_1.default.hash(password, 12);
+        // Create a new user instance
+        const newUser = new User_1.default({
             username,
             email,
             password: hashedPassword,
             role,
         });
+        // Save the new user to the database
         yield newUser.save();
-        return res.status(201).json({ message: 'User registered successfully' });
+        res.status(201).json({ message: 'User registered successfully' });
+        return;
     }
     catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error' });
+        return;
     }
 });
-exports.register = register;
+exports.signup = signup;
+// Login function to authenticate the user and generate JWT
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
     try {
-        // Check if user exists
-        const user = yield user_model_1.default.findOne({ email });
+        // Find the user by username
+        const user = yield User_1.default.findOne({ username });
         if (!user) {
-            return res.status(400).json({ message: 'Invalid credentials' });
+            res.status(404).json({ message: 'User not found' });
+            return;
         }
-        // Compare passwords
-        const isMatch = yield bcryptjs_1.default.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid credentials' });
+        // Compare the password with the hashed password
+        const isPasswordValid = yield bcryptjs_1.default.compare(password, user.password);
+        if (!isPasswordValid) {
+            res.status(400).json({ message: 'Invalid credentials' });
+            return;
         }
-        // Generate JWT token
+        // Generate a JWT token
         const token = jsonwebtoken_1.default.sign({ userId: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
-        return res.status(200).json({ token, user: { username: user.username, email: user.email, role: user.role } });
+        res.status(200).json({ message: 'Login successful', token });
+        return;
     }
     catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error' });
+        return;
     }
 });
 exports.login = login;
