@@ -1,10 +1,9 @@
-import { Request } from 'express';
+import * as express from 'express';
 
-declare module 'express' {
-  export interface Request {
-    user?: {
-      id: string;
-      teamId?: string;
-    };
+declare global {
+  namespace Express {
+    interface Request {
+      userId?: string; // Add the custom property you need
+    }
   }
 }

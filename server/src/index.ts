@@ -1,30 +1,24 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import authRoutes from './routes/auth_route';
+import projectRoutes from './routes/projectRoutes';
+import authRoutes from './routes/authoRouters';
 
 dotenv.config();
 
-// Initialize Express app
 const app = express();
-const port = process.env.PORT || 5000;
 
-// Middleware to parse JSON
+// Middleware
 app.use(express.json());
 
-// Define routes
+// Routes
+app.use('/api/projects', projectRoutes);
 app.use('/api/auth', authRoutes);
 
-// MongoDB connection
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/greenfinance', {
+// Database connection
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/mern-stack', {})
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.log('Error connecting to MongoDB:', err));
 
-}).then(() => {
-  console.log('MongoDB connected');
-}).catch(err => {
-  console.error('MongoDB connection error:', err);
-});
-
-// Start server
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+const port = process.env.PORT || 5000;
+app.listen(port, () => console.log(`Server running on port ${port}`));
